@@ -39,6 +39,7 @@ class Datastore:
     if not self.initialized:
       return
     self.conn.close()
+    self.initialized = False
 
   def create_tables(self):
     if self.initialized:
@@ -58,5 +59,11 @@ class Datastore:
     else:
       return False
 
-
+  def get_telemetries(self):
+    if not self.initialized:
+      return False
+    cur = self.conn.cursor()
+    rows = cur.execute("SELECT * FROM Telemetries;")
+    return rows
+ 
 
