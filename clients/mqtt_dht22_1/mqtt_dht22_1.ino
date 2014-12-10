@@ -6,14 +6,14 @@
 
 #define DHTPIN 2 
 #define MQTT_CLIENTID "ArduinoCorridoi"
-#define MQTT_PUBLISH_TOPIC_TEMPC "Telemetires\Rooms\1\TempC"
-#define MQTT_PUBLISH_TOPIC_HUMIDITY "Telemetires\Rooms\1\Humidity"
-#define MQTT_SERVER "192.168.0.195"
+#define MQTT_PUBLISH_TOPIC_TEMPC "Telemetires/Room/1/TempC"
+#define MQTT_PUBLISH_TOPIC_HUMIDITY "Telemetires/Room/1/Humidity"
+#define MQTT_SERVER "192.168.0.99"
 
 DHT dht(DHTPIN);
 
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xD9, 0x97 };
-byte my_ip[] = { 192, 168, 1, 200 }; // google will tell you: "public ip address"
+byte my_ip[] = { 192, 168, 1, 200 };
 
 EthernetClient ethClient;
 PubSubClient client(MQTT_SERVER, 1883, callback, ethClient);

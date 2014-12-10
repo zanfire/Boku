@@ -14,11 +14,15 @@ if __name__ == "__main__":
 
   print("Starting MQTT Client ...")
   mqttcli = MQTTClient()
+  mqttcli.server_address = "192.168.1.99"
+  mqttcli.ds = ds 
   mqttcli.init()
   mqttcli.start()
   print(" ... done")
 
   print("Starting web server ...")
-  websrv = WebServer()
-  websrv.start()
+  #websrv = WebServer()
+  #websrv.start()
 # TODO: Unblock call to start and wait in a LOOP here.
+  while True:
+    pass

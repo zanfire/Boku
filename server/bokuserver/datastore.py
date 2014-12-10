@@ -13,6 +13,8 @@ class Datastore:
     self.root_directory = os.path.abspath(os.path.dirname(sys.argv[0])) + "/datastore"
     self.db_path = self.root_directory + "/datastore.db"
     self.conn = None
+    self._last_tempc = -1
+    self._last_humidity = -1
     logging.debug("Created datastore instance. DB: {0}, ".format(self.db_path))
 
   def create(self):
@@ -45,19 +47,31 @@ class Datastore:
     if self.initialized:
       return
     cur = self.conn.cursor()
-    cur.execute("CREATE TABLE Telemetries (Timestamp INTEGER, Location TEXT, TempC REAL, Humidity REAL);")
+    cur.execute("CREATE TABLE TempCs (Timestamp INTEGER, Location TEXT, TempC REAL);")
+    cur.execute("CREATE TABLE Humidities (Timestamp INTEGER, Location TEXT, Humidity REAL);")
     self.conn.commit()
 
-  def put_telemetry(self, timestamp, location, temp, humidity):
+
+  def _put_telemetry(self, timestamp, location, table, value):
     if not self.initialized:
       return False
+    print("Storing data in table " + table + ": " + str(timestamp) + ", "+ location + ", " + value)
     cur = self.conn.cursor()
-    cur.execute("INSERT INTO Telemetries VALUES (?, ?, ?, ?);", (timestamp, location, temp, humidity))
+    cur.execute("INSERT INTO " + table + " VALUES (?, ?, ?);", (timestamp, location, value))
     if cur.rowcount == 1:
       self.conn.commit()
       return True
     else:
       return False
+
+
+  def put_telemetry_tempc(self, timestamp, location, v):
+    return self._put_telemetry(timestamp, location, "TempCs", v)
+
+
+  def put_telemetry_humidity(self, timestamp, location, v):
+    return self._put_telemetry(timestamp, location, "Humidities", v)
+
 
   def get_telemetries(self):
     if not self.initialized:
