@@ -14,11 +14,11 @@ def internal_on_message(client, userdata, message):
 
 class MQTTClient:
 
-  def __init__(self):
+  def __init__(self, server_address, ds, ):
     self.initialized = False
     self.client = mqtt.Client("", True, self, mqtt.MQTTv31)
-    self.server_address = "iot.eclipse.org"
-    self.ds = None
+    self.server_address = server_address
+    self.ds = ds
 
   def start(self):
     print("Starting...")
@@ -39,11 +39,12 @@ class MQTTClient:
   def _on_message(self, client, userdata, message):
     print("Payload: " + str(message.topic) + " - " + str(message.payload)) 
     tokens = message.topic.split('/')
-    print("Tokens: " + str(tokens))
     if (tokens[0] == "Telemetries") and (self.ds != None):
-      ts = time.time()
+      ts = int(time.time())
       location = tokens[2]
       value = str(message.payload)
+      if value.startswith("b"):
+          value = value[2:(len(value)-1)]
       if tokens[3] == "TempC":
         self.ds.put_telemetry_tempc(ts, location, value)
       elif tokens[3] == "Humidity":
