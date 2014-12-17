@@ -30,16 +30,21 @@ class AdapterMT(Thread):
             conn.commit()
         conn.close()
 
-    def execute(self, req, arg=None, res=None):
+    def execute(self, req, arg = None, res = None):
+        print("Execute SQL.")
         self.reqs.put((req, arg or tuple(), res))
     
-    def select(self, req, arg=None):
+    def get(self, req, arg = None):
+        print("Select invoke ...")
         res = Queue()
+        output = []
         self.execute(req, arg, res)
         while True:
             rec = res.get()
+            print(rec)
             if rec == "--no more--": break
-            yield rec
+            output.append(rec)
+        return output
 
     def close(self):
         self.execute("--close--")
@@ -48,7 +53,7 @@ class Datastore:
     def __init__(self, dbfile="datastore.db"):
         self.initialized = False
         self.db_path = dbfile
-        self.adapterMT = AdapterMT(self.db_path)
+        self._adapterMT = AdapterMT(self.db_path)
         logging.debug("Created datastore instance. DB: {0}, ".format(self.db_path))
 
     def create(self):
@@ -62,13 +67,13 @@ class Datastore:
         if not os.path.exists(self.db_path):
             logging.debug("Database not present, createding...")
             self.create()
-        self.adapterMT.startThread()
+        self._adapterMT.startThread()
         self.initialized = True
 
     def close(self):
         if not self.initialized:
             return
-        self.adapterMT.close()
+        self._adapterMT.close()
         self.initialized = False
 
     def create_tables(self):
@@ -85,7 +90,7 @@ class Datastore:
         if not self.initialized:
             return False
         print("Storing data in table " + table + ": " + str(timestamp) + ", "+ location + ", " + value)
-        self.adapterMT.execute("INSERT INTO " + table + " VALUES (?, ?, ?);", (timestamp, location, value))
+        self._adapterMT.execute("INSERT INTO " + table + " VALUES (?, ?, ?);", (timestamp, location, value))
         return False
 
     def put_telemetry_tempc(self, timestamp, location, v):
@@ -94,10 +99,13 @@ class Datastore:
     def put_telemetry_humidity(self, timestamp, location, v):
         return self._put_telemetry(timestamp, location, "Humidities", v)
 
-    def get_telemetries(self):
+    def get_tempCs(self):
         if not self.initialized:
             return False
-        cur = self.conn.cursor()
-        rows = cur.execute("SELECT * FROM Telemetries;")
+        print("Get ... started")
+        rows = self._adapterMT.get("SELECT * FROM TempCs;")
+        #print(str(rows))
+        print("Get ... ended")
         return rows
+        #return rows
 

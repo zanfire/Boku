@@ -3,7 +3,7 @@ import argparse
 import logging
 
 from mqtt import MQTTClient
-from web.webserver import WebServer
+from webserver import HTTPServer
 from datastore import Datastore
 
 if __name__ == "__main__":
@@ -28,16 +28,18 @@ if __name__ == "__main__":
     print(" ... done")
 
     print("Starting web server ...")
-    #websrv = WebServer()
-    #websrv.start()
+    websrv = HTTPServer(ds)
+    websrv.init()
+    websrv.start()
     # TODO: Unblock call to start and wait in a LOOP here.
     while True:
         resp = input("Press q to exit ...")
         if resp == "q":
             break;
   
-    print("Shutdown store ...")
+    print("Shutdown ...")
     ds.close()
+    websrv.stop()
     print(" ... done")
 
     print("Process terminated.")
