@@ -2,6 +2,7 @@ import sqlite3
 import os
 import sys
 import logging
+from model import Room
 from threading import Thread
 from queue import Queue
 
@@ -81,6 +82,7 @@ class Datastore:
             return
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
+        cur.execute("CREATE TABLE Rooms (id TEXT, description TEXT);")
         cur.execute("CREATE TABLE TempCs (Timestamp INTEGER, Location TEXT, TempC REAL);")
         cur.execute("CREATE TABLE Humidities (Timestamp INTEGER, Location TEXT, Humidity REAL);")
         conn.commit()
@@ -99,13 +101,28 @@ class Datastore:
     def put_telemetry_humidity(self, timestamp, location, v):
         return self._put_telemetry(timestamp, location, "Humidities", v)
 
-    def get_tempCs(self):
+    def get_tempCs(self, loc):
         if not self.initialized:
             return False
         print("Get ... started")
-        rows = self._adapterMT.get("SELECT * FROM TempCs;")
-        #print(str(rows))
+        rows = self._adapterMT.get("SELECT * FROM TempCs WHERE Location = ? ORDER BY Timestamp DESC;", (loc,))
         print("Get ... ended")
         return rows
-        #return rows
+
+    def get_last_tempCs(self, loc):
+        if not self.initialized:
+            return False
+        print("Get ... started")
+        rows = self._adapterMT.get("SELECT * FROM TempCs WHERE Location = ? LIMIT 1;", (loc,))
+        print("Get ... ended")
+        return rows[0]
+
+    def get_rooms(self):
+        if not self.initialized:
+            return False
+        rows = self._adapterMT.get("SELECT * FROM Rooms;")
+        rooms = []
+        for x in rows:
+            rooms.append(Room(self, x[0], x[1]))
+        return rooms
 

@@ -6,8 +6,8 @@
 
 #define DHTPIN 2 
 #define MQTT_CLIENTID "ArduinoCorridoi"
-#define MQTT_PUBLISH_TOPIC_TEMPC "Telemetires/Room/1/TempC"
-#define MQTT_PUBLISH_TOPIC_HUMIDITY "Telemetires/Room/1/Humidity"
+#define MQTT_PUBLISH_TOPIC_TEMPC "Telemetries/Room/Bedroom/TempC"
+#define MQTT_PUBLISH_TOPIC_HUMIDITY "Telemetries/Room/Bedroom/Humidity"
 #define MQTT_SERVER "192.168.0.99"
 
 DHT dht(DHTPIN);

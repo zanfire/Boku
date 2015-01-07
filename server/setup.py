@@ -10,7 +10,7 @@ config = {
     "download_url": "Where to download it.",
     "author_email": "zanfire@gmail.com",
     "version": "0.1",
-    "install_requires": ["nose", "cherrypy", "paho-mqtt"],
+    "install_requires": ["nose", "cherrypy", "paho-mqtt", "genshi"],
     "packages": ["bokuserver"],
     "scripts": [],
     "name": "bokuserver"

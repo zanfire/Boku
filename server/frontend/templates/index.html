@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  xmlns:py="http://genshi.edgewall.org/">
+
+  <xi:include href="layout.html" />
+  <head>
+    <title>Boku control panel</title>
+  </head>
+
+  <body>
+      <!-- Page Content -->
+      <div id="page-wrapper">
+          <div class="container-fluid">
+              <div class="row">
+                  <div class="col-lg-12">
+                      <h1 class="page-header">Dashboard</h1>
+                  </div>
+                  <!-- /.col-lg-12 -->
+              </div>
+            <div class="row" py:if="rooms">
+              <div py:for="room in rooms" class="col-lg-3 col-md-6">
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+                    <div class="row">
+                      <div class="col-xs-3">
+                        <i class="fa fa-comments fa-5x"></i>
+                      </div>
+                      <div class="col-xs-9 text-right">
+                        <div class="huge" id="${room.id}_lastTempC">- C</div>
+                      </div>
+                    </div>
+                  </div>
+                  <a href="/room/${room.id}">
+                    <div class="panel-footer">
+                      <span class="pull-left">${room.description}</span>
+                      <div class="clearfix"></div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+              <!-- /.row -->
+          </div>
+          <!-- /.container-fluid -->
+        </div>
+       <!-- /#page-wrapper -->
+  <!-- no good solution, it doesn't work  I would -->
+  <script>
+      $(document).ready(function() {  
+    <script py:for="room in rooms" py:strip="">
+          ajax_lastTempC("${room.id}");
+          setInterval(function() { ajax_lastTempC("${room.id}");}, 60000);
+    </script>
+         });
+    </script>
+  </body>
+</html>

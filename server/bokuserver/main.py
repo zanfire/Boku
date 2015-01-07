@@ -13,12 +13,19 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", help="Enable verbose output.", action="store_true")
     args = parser.parse_args()
 
+
     print("Boku server, Copyright Matteo Valdina 2014.\n")
 
     print("Starting store ...")
     ds = Datastore(args.datastore)
     ds.init()
     print(" ... done")
+
+    rooms = ds.get_rooms()
+
+    for x in rooms:
+        print("Loaded room ID:" + x.id + " desc: " + x.description)
+
 
     print("Starting MQTT Client ...")
     mqttcli = MQTTClient(args.mqttbroker, ds)

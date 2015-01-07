@@ -4,13 +4,28 @@ import sys
 import cherrypy
 import threading
 import json
+from genshi.template import TemplateLoader
 
 from datastore import Datastore
 
 class ContentGenerator(object):
+    def __init__(self, ds):
+        self.ds = ds
+        self.loader = TemplateLoader(os.path.join(os.path.dirname(__file__), "..", "frontend", "templates"), auto_reload=True)
+
     @cherrypy.expose
     def index(self):
-        return file("index.html")
+        tmpl = self.loader.load("index.html")
+        stream = tmpl.generate(title="Boku", rooms=self.ds.get_rooms())
+        return stream.render("xhtml", doctype="html")
+        #return file("index.html")
+
+    @cherrypy.expose
+    def table(self, id=None):
+        tmpl = self.loader.load("sensors_table.html")
+        stream = tmpl.generate(title="Boku", rooms=self.ds.get_rooms(), room_id=id)
+        return stream.render("xhtml", doctype="html")
+ 
 
 class RESTService(object):
     """Handle REST requests (we provide only GET) to access to TempCs and Humidity."""
@@ -22,10 +37,9 @@ class RESTService(object):
         self.ds = ds
 
     @cherrypy.tools.accept(media="text/plain")
-    def GET(self, roomID = None, kind = None):
-        print("Asking for " + roomID + ", kind "+ kind)
-        rows = self.ds.get_tempCs() # WHERE Location = \"" + + "\";" kind, roomID)
-        #return str(rows)
+    def GET(self, roomID = None, kind = None, count = None):
+        rows = self.ds.get_tempCs(roomID)
+        #cherrypy.response.headers["Content-Type"] = "application/json"
         list = []
         for x in rows:
             entry = {
@@ -54,7 +68,7 @@ class HTTPServer(threading.Thread):
         threading.Thread.__init__(self)
         self.ds = ds
         self.sync = threading.Condition()
-        self.webapp = ContentGenerator()
+        self.webapp = ContentGenerator(ds)
         self.api = RESTService(ds);
         self.root_directory = os.path.abspath(os.path.dirname(sys.argv[0])) + "/../frontend"
  
