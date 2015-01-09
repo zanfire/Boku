@@ -23,7 +23,7 @@ class ContentGenerator(object):
     @cherrypy.expose
     def table(self, id=None):
         tmpl = self.loader.load("sensors_table.html")
-        stream = tmpl.generate(title="Boku", rooms=self.ds.get_rooms(), room_id=id)
+        stream = tmpl.generate(title="Boku", rooms=self.ds.get_rooms(), room=self.ds.get_room(id))
         return stream.render("xhtml", doctype="html")
  
 
@@ -37,7 +37,7 @@ class RESTService(object):
         self.ds = ds
 
     @cherrypy.tools.accept(media="text/plain")
-    def GET(self, roomID = None, kind = None, count = None):
+    def GET(self, roomID = None, kind = None, count = None, *args, **kw):
         rows = self.ds.get_tempCs(roomID)
         #cherrypy.response.headers["Content-Type"] = "application/json"
         list = []
@@ -49,7 +49,7 @@ class RESTService(object):
                     }
             list.append(entry)
         jsonObj =  {
-                "result": list
+                "data": list
                 }
         return json.dumps(jsonObj, indent=4, sort_keys=True) 
 

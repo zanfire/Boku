@@ -126,3 +126,11 @@ class Datastore:
             rooms.append(Room(self, x[0], x[1]))
         return rooms
 
+    def get_room(self, id):
+        if not self.initialized:
+            return False
+        rows = self._adapterMT.get("SELECT * FROM Rooms WHERE id = ?;", (id,))
+        x = rows[0]
+        return Room(self, x[0], x[1])
+
+

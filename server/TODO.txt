@@ -1,0 +1,14 @@
+TODO List:
+~~~~~~~~~~
+
+ - Add logging to the whole program.
+ - Add ability to clear data.
+ - Add charts
+ - Revise menu list
+ - Add ability to create the room set.
+ - Add pagination to API
+ - Add pagination on table.
+ - Add Humidity flow.
+
+ - Be pythonic!
+
